@@ -1,15 +1,8 @@
-import os
-
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# --- API ---
-OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-
 # --- LLM behaviour ---
-LLM_TIMEOUT_SECONDS: int = 10
 LLM_MAX_RETRIES: int = 3
 
 # --- Scoring: industry fit ---

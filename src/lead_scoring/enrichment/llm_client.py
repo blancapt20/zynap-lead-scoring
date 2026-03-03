@@ -2,33 +2,11 @@ import json
 import time
 from typing import Protocol, runtime_checkable
 
-import openai
-
-from lead_scoring.config import OPENAI_API_KEY, OPENAI_MODEL, LLM_TIMEOUT_SECONDS
-
-
 @runtime_checkable
 class LLMClient(Protocol):
     def complete(self, system: str, user: str) -> str:
         """Send a system + user prompt and return the raw string response."""
         ...
-
-
-class OpenAIClient:
-    def __init__(self) -> None:
-        self._client = openai.OpenAI(api_key=OPENAI_API_KEY)
-
-    def complete(self, system: str, user: str) -> str:
-        response = self._client.chat.completions.create(
-            model=OPENAI_MODEL,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            temperature=0,
-            timeout=LLM_TIMEOUT_SECONDS,
-        )
-        return response.choices[0].message.content or ""
 
 
 class MockLLMClient:
@@ -62,10 +40,17 @@ class MockLLMClient:
     }
 
     def complete(self, system: str, user: str) -> str:
-        time.sleep(0.1)  # simulate network latency
+        return mock_llm_call(user)
 
-        for keyword, response in self._MOCK_RESPONSES.items():
-            if keyword in user.lower():
-                return json.dumps(response)
 
-        return json.dumps({"industry": "Other", "size": 0, "intent": "Unknown"})
+def mock_llm_call(raw_prompt: str) -> str:
+    """
+    Simulates API latency and returns deterministic JSON for known test leads.
+    """
+    time.sleep(0.1)
+
+    for keyword, response in MockLLMClient._MOCK_RESPONSES.items():
+        if keyword in raw_prompt.lower():
+            return json.dumps(response)
+
+    return json.dumps({"industry": "Other", "size": 0, "intent": "Unknown"})

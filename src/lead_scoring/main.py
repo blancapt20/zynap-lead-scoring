@@ -1,11 +1,9 @@
 import json
 import logging
-import sys
 from pathlib import Path
 
 from lead_scoring.enrichment.agent import enrich_lead
-from lead_scoring.enrichment.llm_client import MockLLMClient, OpenAIClient
-from lead_scoring.config import OPENAI_API_KEY
+from lead_scoring.enrichment.llm_client import MockLLMClient
 from lead_scoring.models import Lead
 from lead_scoring.output.formatter import build_scored_lead
 from lead_scoring.scoring.engine import score_lead
@@ -22,8 +20,8 @@ def load_leads(path: Path) -> list[Lead]:
     return [Lead(**item) for item in raw]
 
 
-def run_pipeline(use_mock: bool = False) -> list[dict]:
-    client = MockLLMClient() if use_mock else OpenAIClient()
+def run_pipeline() -> list[dict]:
+    client = MockLLMClient()
     leads = load_leads(DATA_PATH)
     results = []
 
@@ -40,11 +38,8 @@ def run_pipeline(use_mock: bool = False) -> list[dict]:
 
 
 def main() -> None:
-    use_mock = not bool(OPENAI_API_KEY)
-    if use_mock:
-        logger.info("No OPENAI_API_KEY found — running with MockLLMClient.")
-
-    results = run_pipeline(use_mock=use_mock)
+    logger.info("Running with mock_llm_call() via MockLLMClient.")
+    results = run_pipeline()
     print(json.dumps(results, indent=2))
 
 
