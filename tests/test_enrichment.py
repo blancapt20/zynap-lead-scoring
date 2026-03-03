@@ -1,4 +1,3 @@
-import json
 import pytest
 
 from lead_scoring.enrichment.agent import enrich_lead
@@ -18,11 +17,6 @@ def cybersecurity_lead() -> Lead:
         email="sarah.connor@sky-net.org",
         raw_note="We are a cybersecurity firm based in London with about 250 employees.",
     )
-
-
-@pytest.fixture
-def vague_lead() -> Lead:
-    return Lead(id="lead_004", email="unknown@ghost.com", raw_note="Interested in pricing.")
 
 
 def test_enrich_lead_returns_enriched_data(mock_client, cybersecurity_lead):
