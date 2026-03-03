@@ -26,28 +26,40 @@ class MockLLMClient:
     response_format) so this module can be swapped with a provider call later.
     """
 
-    _MOCK_RESPONSES: dict[str, dict] = {
-        "sky-net": {
-            "industry": "Cybersecurity",
-            "size": 250,
-            "intent": "Automate threat response operations",
-        },
-        "baking": {
-            "industry": "Retail",
-            "size": 5,
-            "intent": "Basic firewall protection for small business",
-        },
-        "fintech": {
-            "industry": "Fintech",
-            "size": 75,
-            "intent": "Scalable security platform for regulated startup",
-        },
-        "ghost": {
-            "industry": "Other",
-            "size": 0,
-            "intent": "General pricing inquiry with no additional context",
-        },
-    }
+    _MOCK_PATTERNS: list[tuple[tuple[str, ...], dict[str, str | int]]] = [
+        (
+            ("cybersecurity", "threat response", "sky-net"),
+            {
+                "industry": "Cybersecurity",
+                "size": 250,
+                "intent": "Automate threat response operations",
+            },
+        ),
+        (
+            ("bakery", "baking", "firewall for our wifi"),
+            {
+                "industry": "Retail",
+                "size": 5,
+                "intent": "Basic firewall protection for small business",
+            },
+        ),
+        (
+            ("fintech", "regulated", "aws"),
+            {
+                "industry": "Fintech",
+                "size": 75,
+                "intent": "Scalable security platform for regulated startup",
+            },
+        ),
+        (
+            ("interested in pricing", "pricing inquiry", "ghost"),
+            {
+                "industry": "Other",
+                "size": 0,
+                "intent": "General pricing inquiry with no additional context",
+            },
+        ),
+    ]
 
     def complete(self, system: str, user: str) -> str:
         return mock_llm_call(user)
@@ -59,8 +71,9 @@ def mock_llm_call(raw_prompt: str) -> str:
     """
     time.sleep(0.1)
 
-    for keyword, response in MockLLMClient._MOCK_RESPONSES.items():
-        if keyword in raw_prompt.lower():
+    normalized = raw_prompt.lower()
+    for keywords, response in MockLLMClient._MOCK_PATTERNS:
+        if any(keyword in normalized for keyword in keywords):
             return json.dumps(response)
 
     # Keep return as strict JSON to mirror a real JSON-mode response.
