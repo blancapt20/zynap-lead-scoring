@@ -23,12 +23,13 @@ Core components:
 - **LeadEnrichmentAgent** (`src/lead_scoring/enrichment/agent.py`): LLM wrapper for structured extraction with retry + fallback handling.
 - **LeadScorer** (`src/lead_scoring/scoring/rules.py`, `src/lead_scoring/scoring/engine.py`): deterministic business logic for reproducible scores.
 - **CRM Router** (`src/lead_scoring/output/formatter.py`): maps score to actionable CRM route.
-- **Main Orchestrator** (`src/lead_scoring/main.py`): coordinates the full pipeline from input loading to JSON output.
+- **Pipeline Orchestrator** (`src/lead_scoring/pipeline.py`): coordinates input loading, enrichment, scoring, and output assembly.
+- **CLI Entrypoint** (`src/lead_scoring/main.py`): thin executable wrapper that runs the pipeline and prints JSON output.
 
 ## 🛠 Tech Stack
 
 - Python `3.11+`
-- Groq API (Llama3-70B) for production LLM integration
+- Mock LLM client (`mock_llm_call`) for deterministic enrichment
 - Pydantic (schema validation)
 - python-dotenv (environment configuration)
 - Pytest (functional verification)
@@ -66,15 +67,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Add your Groq API key
-
-Create a `.env` file:
-
-```env
-GROQ_API_KEY=your_key_here
-```
-
-### 5. Run the script
+### 4. Run the script
 
 Package entrypoint (recommended in this repo):
 
@@ -87,6 +80,8 @@ Optional CLI entrypoint (after `pip install -e .`):
 ```bash
 lead-scoring
 ```
+
+No API key is required for the current implementation because enrichment is hardcoded to `MockLLMClient`.
 
 ## 📥 Input Format
 
