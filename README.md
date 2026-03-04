@@ -82,7 +82,19 @@ Optional CLI entrypoint (after `pip install -e .`):
 lead-scoring
 ```
 
-## ⚙️ .env 
+## ⚙️ .env
+
+Create your local env file first:
+
+```bash
+cp .env.example .env
+```
+
+PowerShell alternative:
+
+```powershell
+Copy-Item .env.example .env
+```
 
 Client selection is automatic:
 

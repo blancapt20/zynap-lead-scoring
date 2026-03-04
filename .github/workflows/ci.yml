@@ -24,4 +24,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
+        env:
+          API_KEY: ""
+          LLM_MODEL: ""
+          LLM_PROVIDER: "mock"
         run: pytest -q
