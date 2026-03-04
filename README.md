@@ -82,6 +82,8 @@ Optional CLI entrypoint (after `pip install -e .`):
 lead-scoring
 ```
 
+## ⚙️ .env 
+
 Client selection is automatic:
 
 - No `.env` file -> uses deterministic `MockLLMClient`.
