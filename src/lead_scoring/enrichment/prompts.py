@@ -29,17 +29,27 @@ Field rules:
 - One sentence, <= 20 words.
 - Describe what the lead wants to achieve (business problem or buying intent).
 - Avoid generic wording like "wants information" unless no better signal exists.
+- Infer intent by semantic meaning, not exact wording.
+- Convert short or vague phrases into a specific business intent sentence whenever there is any buying signal.
+- Use these intent categories as guidance (examples are non-exhaustive):
+  - Pricing/commercial inquiry (pricing, quote, budget, cost, commercial terms).
+  - Product evaluation (demo, trial, pilot, proof of concept, compare options).
+  - Deployment/integration (implementation, migration, rollout, stack integration).
+  - Security/compliance outcomes (audit readiness, regulation, risk reduction, incident response).
+- If multiple signals exist, prioritize the strongest purchase-near signal, then compliance/security goals.
 
 Normalization and robustness:
 - Handle typos, shorthand, mixed casing, and partial context.
 - Ignore irrelevant personal details, greetings, and signatures.
 - If the note conflicts internally, prioritize the most explicit and recent business signal.
+- For industry classification, treat commerce-like terms (bakery, store, shop, ecommerce, merchant) as "Retail".
 
 Fallback behavior:
 - If extraction is ambiguous, prefer safe defaults:
   - industry = "Other"
   - size = 0
   - intent = "General inquiry with limited context"
+- Only use fallback intent when no meaningful buying or business objective can be inferred.
 """.strip()
 
 ENRICHMENT_USER_PROMPT = """
