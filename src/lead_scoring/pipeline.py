@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from lead_scoring.enrichment.agent import enrich_lead
-from lead_scoring.enrichment.llm_client import LLMClient, MockLLMClient
+from lead_scoring.enrichment.llm_client import LLMClient, build_llm_client
 from lead_scoring.io import load_leads, resolve_data_path
 from lead_scoring.output.formatter import build_scored_lead
 from lead_scoring.scoring.engine import score_lead
@@ -14,7 +14,7 @@ def run_pipeline(data_path: Path | None = None, client: LLMClient | None = None)
     """
     Executes the full lead scoring flow and returns CRM-ready dictionaries.
     """
-    llm_client = client or MockLLMClient()
+    llm_client = client or build_llm_client()
     leads = load_leads(resolve_data_path(data_path))
     results: list[dict] = []
 

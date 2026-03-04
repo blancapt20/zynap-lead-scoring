@@ -7,11 +7,12 @@ load_dotenv()
 # --- LLM behaviour ---
 LLM_MAX_RETRIES: int = 3
 LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "mock")
-LLM_MODEL: str = os.getenv("LLM_MODEL", "gpt-5.3")
+LLM_MODEL: str = os.getenv("LLM_MODEL", "").strip()
 LLM_TEMPERATURE: float = float(os.getenv("LLM_TEMPERATURE", "0.0"))
 LLM_TOP_P: float = float(os.getenv("LLM_TOP_P", "1.0"))
 # Keep this explicit for JSON-output enforcement in real API clients.
 LLM_RESPONSE_FORMAT: str = os.getenv("LLM_RESPONSE_FORMAT", "json_object")
+API_KEY: str = os.getenv("API_KEY", "")
 
 # --- Scoring: industry fit ---
 # Maps industry label → points awarded

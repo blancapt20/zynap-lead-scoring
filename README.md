@@ -30,6 +30,7 @@ Core components:
 
 - Python `3.11+`
 - Mock LLM client (`mock_llm_call`) for deterministic enrichment
+- Optional OpenAI client path (`API_KEY`) using Structured Outputs JSON schema
 - Pydantic (schema validation)
 - python-dotenv (environment configuration)
 - Pytest (functional verification)
@@ -81,7 +82,28 @@ Optional CLI entrypoint (after `pip install -e .`):
 lead-scoring
 ```
 
-No API key is required for the current implementation because enrichment is hardcoded to `MockLLMClient`.
+Client selection is automatic:
+
+- No `.env` file -> uses deterministic `MockLLMClient`.
+- `.env` exists but `API_KEY` is missing or empty -> uses deterministic `MockLLMClient`.
+- `.env` has `API_KEY` and `LLM_MODEL` -> uses OpenAI with structured JSON schema output.
+- `.env` has `API_KEY` but missing/empty `LLM_MODEL` -> raises a startup error with a clear message.
+
+Example `.env` for OpenAI mode:
+
+```dotenv
+API_KEY=your_openai_api_key_here
+LLM_MODEL=gpt-4.1
+LLM_TEMPERATURE=0.0
+LLM_TOP_P=1.0
+```
+
+Example `.env` for mock mode:
+
+```dotenv
+# Leave API_KEY empty (or omit it)
+API_KEY=
+```
 
 ## 📥 Input Format
 
@@ -168,6 +190,7 @@ Run by module:
 pytest tests/test_enrichment.py -q
 pytest tests/test_scoring.py -q
 pytest tests/test_output.py -q
+pytest tests/test_pipeline_io.py -q
 ```
 
 What these tests prove:
@@ -175,6 +198,7 @@ What these tests prove:
 - `test_enrichment.py`: extraction correctness, model validity, and fallback behavior under failure/malformed payloads
 - `test_scoring.py`: scoring rule correctness, combined totals, and score clamping
 - `test_output.py`: CRM routing correctness and final object shape
+- `test_pipeline_io.py`: input loading, path resolution behavior, and pipeline execution with explicit data path
 
 Quick validation flow:
 
@@ -189,12 +213,13 @@ Quick validation flow:
 - "Interested in pricing" is treated as low-intent content.
 - Email domain is not currently used as a scoring signal.
 
-## 🔮 Future Improvements
+## 🔮 Production Considerations
 
-- Plug in live Groq client with configurable model + temperature
-- Add confidence scoring for enrichment output
-- Add async/batch processing for higher throughput
-- Add structured output enforcement via function/tool calling
-- Add persistence layer and CRM API integration
-- Add observability (metrics, latency, error rate, retries)
+- Add enrichment confidence scoring and route low-confidence leads to human review.
+- Evolve `content_quality` to a hybrid approach: deterministic baseline + AI intent-quality signal.
+- Expand ICP signals (e.g., tech stack, geography, funding stage, buying timeline).
+- Capture outcome feedback from Sales (won/lost) to continuously tune scoring rules.
+- Add observability dashboards: fallback rate, parse-failure rate, latency, and throughput.
+- Add async/batch processing to handle weekly lead volume spikes efficiently.
+- Add an eval suite (task-specific dataset + pass/fail metrics) and run it continuously on prompt/rule changes.
 
